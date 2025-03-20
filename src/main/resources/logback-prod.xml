@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+    <property name="DEV_HOME" value="/data/connectome/aggregator_v2Log"/>
+    <property name="PREFIX" value="aggregator_v2"/>
+
+    <!-- FILE_DEBUG Appender -->
+    <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+
+        <file>${DEV_HOME}/${PREFIX}.debug.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${DEV_HOME}/archived/${PREFIX}.debug.%d{yyyy-MM-dd}_%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <!--
+                %d{YYYY-MM-dd HH:mm:ss.SSS} => 로깅 시간
+                %-5level => 로깅 레벨
+                %logger{36} => loggername 축약 (36은 최대 자릿수)
+                %msg%n => 로그메시지와 개행
+            -->
+            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [Aggregator_v2] %-5level %logger{36} [%M:%L] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- FILE_DEBUG Appender -->
+    <appender name="FILE_OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
+        <file>${DEV_HOME}/${PREFIX}.out.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${DEV_HOME}/archived/${PREFIX}.out.%d{yyyy-MM-dd}_%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [Aggregator_v2] %-5level %logger{36} [%M:%L] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- FILE_ERR Appender -->
+    <appender name="FILE_ERR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+
+        <file>${DEV_HOME}/${PREFIX}.err.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${DEV_HOME}/archived/${PREFIX}.err.%d{yyyy-MM-dd}_%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [Aggregator_v2] %-5level %logger{36} [%M:%L] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Console output -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} [%M:%L] - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <!-- suppress logback internal status messages -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+
+    <!-- default info logger -->
+    <logger name="com.naru.aggregator_v2" level="info" additivity="false">
+        <appender-ref ref="FILE_OUT" />
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <!-- debug logger -->
+    <logger name="com.naru.aggregator_v2" level="debug" additivity="false">
+        <appender-ref ref="FILE_DEBUG" />
+    </logger>
+
+    <!-- root -->
+    <root level="error">
+        <appender-ref ref="FILE_ERR" />
+    </root>
+
+</configuration>
