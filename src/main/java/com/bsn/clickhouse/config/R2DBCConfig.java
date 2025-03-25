@@ -1,12 +1,13 @@
 package com.bsn.clickhouse.config;
 
+import java.time.Duration;
 import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static io.r2dbc.spi.ConnectionFactories.get;
-import static java.lang.String.format;
+import io.r2dbc.pool.ConnectionPool;
+import io.r2dbc.pool.ConnectionPoolConfiguration;
 
 @Configuration
 public class R2DBCConfig {
@@ -28,8 +29,36 @@ public class R2DBCConfig {
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        return get(format("r2dbc:clickhouse:http://%s:%s@%s:%d/%s", user, password,
-                host, Integer.parseInt(port), database));
+        String url = String.format("r2dbc:clickhouse:http://%s:%s@%s:%s/%s",
+                user, password, host, port, database);
+
+        // 기본 ConnectionFactory 생성
+        ConnectionFactory connectionFactory = io.r2dbc.spi.ConnectionFactories.get(url);
+
+        // 기본 ConnectionPool 구성
+        ConnectionPoolConfiguration poolConfig = ConnectionPoolConfiguration.builder(connectionFactory)
+                .maxSize(10)
+                .initialSize(5)
+                .maxIdleTime(Duration.ofMinutes(10))
+                .build();
+
+        return new ConnectionPool(poolConfig);
+    }
+
+    @Bean
+    public ConnectionFactory anotherConnectionFactory() {
+        String url = String.format("r2dbc:clickhouse:http://%s:%s@%s:%s/%s",
+                user, password, host, port, database);
+
+        ConnectionFactory connectionFactory = io.r2dbc.spi.ConnectionFactories.get(url);
+
+        // 별도의 ConnectionPool 구성
+        ConnectionPoolConfiguration poolConfig = ConnectionPoolConfiguration.builder(connectionFactory)
+                .maxSize(10)
+                .initialSize(5)
+                .maxIdleTime(Duration.ofMinutes(10))
+                .build();
+
+        return new ConnectionPool(poolConfig);
     }
 }
-
